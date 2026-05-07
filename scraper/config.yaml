@@ -1,0 +1,37 @@
+# Configuración de scraping — escalable
+# Para agregar modelos/marcas: sumar entradas abajo.
+# Para correr solo algunos: usar flag --marca/--modelo en CLI.
+
+site: MLA                  # MercadoLibre Argentina
+category: MLA1744          # Autos, Motos y Otros (MLA1743 = solo autos)
+year_from: 1995
+year_to: 2026
+condition: null            # null | used | new  (used = 2230581)
+fetch_description: true    # True = trae descripción completa (más lento)
+max_workers: 5             # API oficial: 5 hilos paralelos OK
+request_delay: 0.1         # API oficial: rate limit alto, no hace falta delay
+
+# Pausa entre modelos (segundos) para evitar bloqueo de ML
+inter_model_delay: 30
+
+# Cap de descripciones por corrida (las restantes se traen al día siguiente)
+max_descriptions_per_run: 400
+
+# Marcas y modelos a scrapear
+marcas:
+  Toyota:
+    modelos:
+      - Yaris
+      - Etios
+      - Corolla
+      - Corolla Cross
+      - Hilux
+      - SW4
+      - RAV4
+      - Hiace
+      - Camry
+      - 4Runner
+      - Land Cruiser
+      - Prius
+      - C-HR
+      - Corolla Hatchback
