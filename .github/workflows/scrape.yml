@@ -1,0 +1,50 @@
+name: Scrape MercadoLibre Autos
+
+on:
+  schedule:
+    - cron: "0 9 * * *"  # Diario 9 UTC (6 AM ART)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install deps
+        run: pip install -r scraper/requirements.txt
+
+      - name: Bootstrap tokens.json from secret
+        run: |
+          mkdir -p data/_cache
+          cat > data/_cache/tokens.json <<EOF
+          {
+            "access_token": "expired",
+            "refresh_token": "${{ secrets.ML_REFRESH_TOKEN }}",
+            "expires_in": 21600,
+            "_issued_at": 0
+          }
+          EOF
+
+      - name: Run scraper
+        env:
+          ML_CLIENT_ID: ${{ secrets.ML_CLIENT_ID }}
+          ML_CLIENT_SECRET: ${{ secrets.ML_CLIENT_SECRET }}
+        working-directory: scraper
+        run: python scraper.py
+
+      - name: Commit data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/Toyota/ data/_cache/descripciones.csv 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "data: scrape $(date -u +%Y-%m-%d)"
+          git push
