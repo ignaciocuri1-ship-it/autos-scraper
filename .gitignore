@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.DS_Store
+data/_browser_profile/
+data/_debug/
+data/_cache/
